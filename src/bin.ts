@@ -1,71 +1,53 @@
-import { ESLint } from "eslint";
 import Table, { HorizontalTableRow } from "cli-table3";
-import { ESLintOutput } from "./types/eslint.interface";
 import { GitUtil } from "./utils/git.util";
-import { relative, resolve } from "path";
-import minimist from "minimist";
+import { strip } from "ansicolor";
+import { ESLintFeature } from "./feature/eslint";
+import { resolve } from "path";
+import { VueTSC } from "./feature/vue-tsc";
+import { readFileSync } from "fs";
+import {isArray, mergeWith} from "lodash-es";
 
-const argv = minimist(process.argv.slice(2))
+function mergeCustomizer<T>(objValue:Array<T>,srcValue:Array<T>){
+  if(isArray(objValue)){
+    return objValue.concat(srcValue)
+  }
+}
+
 
 const basePath = process.cwd();
-const projectPath = argv.file;
+const config = JSON.parse(
+  readFileSync(resolve(basePath, "moretta.config.json")).toString()
+);
 (async () => {
-  const eslint = new ESLint({ cache: true });
-
-  const result = await eslint.lintFiles(resolve(basePath,projectPath));
-  const formatter = await eslint.loadFormatter("json");
-  const resultJson: ESLintOutput[] = JSON.parse(
-    formatter.format(result) as string
-  );
-  const res = resultJson
-    .filter(
-      (item) =>
-        (item.errorCount && item.errorCount > 0) ||
-        (item.warningCount && item.warningCount > 0)
-    )
-    .map(
-      ({
-        filePath,
-        messages,
-        errorCount,
-        fatalErrorCount,
-        warningCount,
-        fixableErrorCount,
-        fixableWarningCount,
-        usedDeprecatedRules,
-      }) => ({
-        filePath,
-        messages,
-        errorCount,
-        fatalErrorCount,
-        warningCount,
-        fixableErrorCount,
-        fixableWarningCount,
-        usedDeprecatedRules,
-      })
-    );
-  const table = new Table({head:["user","time","error lint","line","severity"]});
-  const tableArr:HorizontalTableRow[] = [];
   const git = new GitUtil(basePath);
-  res.some((item) => {
-    const filePath = relative(basePath, item.filePath as string);
-    tableArr.push([{ colSpan: 5, content: filePath }]); 
-    item.messages?.some((msg) => {
-      const blame = git.blame(filePath, msg.line, msg.endLine);
-      tableArr.push([
-        blame?.user,
-        blame?.time,
-        msg.ruleId,
-        `${msg.line} - ${msg.endLine}`,
-        msg.severity,
-      ]);
-    });
+  const table = new Table({
+    head: ["type","user", "time", "error lint", "line", "severity"],
   });
-  if(tableArr.length>1){
+  const tableArr: HorizontalTableRow[] = [];
+  let records: Record<string, (string | undefined)[][]> = {};
+  if (config.eslint) {
+    const eslint = new ESLintFeature(
+      resolve(basePath, config.eslint),
+      git,
+      basePath
+    );
+    // records = Object.assign({}, records, await eslint.lint());
+    records = mergeWith(records,await eslint.lint(),mergeCustomizer)
+  }
+  if (config["vue-tsc"]) {
+    const vue_tsc = new VueTSC(git, "pnpm", basePath);
+    records = mergeWith(records,await vue_tsc.lint(),mergeCustomizer)
+  }
+  Object.keys(records).sort((x,y)=>x.localeCompare(y)).some((key) => {
+    tableArr.push(["file",{ colSpan: 5, content: key }]);
+    tableArr.push(...records[key]);
+  });
+
+  if (tableArr.length > 1) {
     table.push(...tableArr);
-    console.log(table.toString());
-    throw new Error("moretta: more error in files")
-  }else{
+    console.log(strip(table.toString()));
+    throw new Error("moretta: more error in files");
+  } else {
     console.log("moretta: no error in files");
   }
 })();
