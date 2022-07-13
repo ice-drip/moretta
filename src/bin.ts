@@ -52,7 +52,7 @@ const config = JSON.parse(
   if (tableArr.length > 1) {
     table.push(...tableArr);
     console.log(strip(table.toString()));
-    throw new Error("moretta: more error in files");
+    process.exit(1)
   } else {
     console.log("moretta: no error in files");
   }
