@@ -3,14 +3,12 @@ lockfileVersion: 5.4
 specifiers:
   '@types/eslint': ^8.4.5
   '@types/lodash-es': ^4.17.6
-  '@types/minimist': ^1.2.2
   '@types/node': ^16
   ansicolor: ^1.1.100
   cli-table3: ^0.6.2
   dayjs: ^1.11.3
   eslint: ^8.19.0
   lodash-es: ^4.17.21
-  minimist: ^1.2.6
   rollup: ^2.76.0
   rollup-plugin-typescript2: ^0.32.1
   ts-node: ^10.8.2
@@ -24,11 +22,9 @@ dependencies:
   dayjs: 1.11.3
   eslint: 8.19.0
   lodash-es: 4.17.21
-  minimist: 1.2.6
 
 devDependencies:
   '@types/eslint': 8.4.5
-  '@types/minimist': 1.2.2
   '@types/node': 16.11.43
   rollup: 2.76.0
   rollup-plugin-typescript2: 0.32.1_sk2p66houzdp4ognhkknlnus3i
@@ -148,10 +144,6 @@ packages:
   /@types/lodash/4.14.182:
     resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
     dev: false
-
-  /@types/minimist/1.2.2:
-    resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
-    dev: true
 
   /@types/node/16.11.43:
     resolution: {integrity: sha512-GqWykok+3uocgfAJM8imbozrqLnPyTrpFlrryURQlw1EesPUCx5XxTiucWDSFF9/NUEXDuD4bnvHm8xfVGWTpQ==}
@@ -658,10 +650,6 @@ packages:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
     dependencies:
       brace-expansion: 1.1.11
-    dev: false
-
-  /minimist/1.2.6:
-    resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
     dev: false
 
   /ms/2.1.2:
