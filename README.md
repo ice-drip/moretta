@@ -2,6 +2,14 @@
 
 A enhance linter util
 
+## Support
+
+* [x] eslint
+* [x] vue-tsc
+* [ ] tsc
+* [ ] stylelint
+* [ ] prettier
+
 ## Installation
 
 Install with npm
@@ -27,9 +35,22 @@ Install with pnpm
 Example command
 
 ```bash
-yarn moretta --file "src/**/*.{ts,html}"
-npx moretta --file "src/**/*.{ts,html}"
-pnpm moretta --file "src/**/*.{ts,html}"
+yarn moretta
+npx moretta
+pnpm moretta
+```
+
+Example Config
+```json
+{
+  // package manage: "npm"|"yarn"|"pnpm"
+  "pm":"pnpm", 
+  // eslint match file
+  "eslint":"src/**/*.{vue,ts,tsx}", 
+  // package script key 
+  // package.json script: {"vue-tsc":"vue-tsc --noEmit --skipLibCheck --pretty"}
+  "vue-tsc":"vue-tsc" 
+}
 ```
 
 ## License
