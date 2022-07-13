@@ -1,10 +1,13 @@
 {
   "name": "@kaffee/moretta",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "ts-node --esm --experimental-specifier-resolution=node ./src/bin.ts"
+    "test": "ts-node --esm --experimental-specifier-resolution=node ./src/bin.ts",
+    "build": "pnpm rollup -c",
+    "ipublish": "pnpm publish --no-git-checks --registry https://registry.npmjs.org/ --access public",
+    "prepublish": "pnpm build"
   },
   "bin": {
     "moretta": "./dist/bin.js"

@@ -1,5 +1,5 @@
 import { ESLint } from "eslint";
-import Table from "cli-table3";
+import Table, { HorizontalTableRow } from "cli-table3";
 import { ESLintOutput } from "./types/eslint.interface";
 import { GitUtil } from "./utils/git.util";
 import { relative, resolve } from "path";
@@ -44,15 +44,15 @@ const projectPath = argv.file;
         usedDeprecatedRules,
       })
     );
-  const table = new Table();
-  table.push(["user","time","error lint","line","severity"]); 
+  const table = new Table({head:["user","time","error lint","line","severity"]});
+  const tableArr:HorizontalTableRow[] = [];
   const git = new GitUtil(basePath);
   res.some((item) => {
     const filePath = relative(basePath, item.filePath as string);
-    table.push([{ colSpan: 5, content: filePath }]); 
+    tableArr.push([{ colSpan: 5, content: filePath }]); 
     item.messages?.some((msg) => {
       const blame = git.blame(filePath, msg.line, msg.endLine);
-      table.push([
+      tableArr.push([
         blame?.user,
         blame?.time,
         msg.ruleId,
@@ -61,5 +61,11 @@ const projectPath = argv.file;
       ]);
     });
   });
-  console.log(table.toString());
+  if(tableArr.length>1){
+    table.push(...tableArr);
+    console.log(table.toString());
+    throw new Error("moretta: more error in files")
+  }else{
+    console.log("moretta: no error in files");
+  }
 })();
