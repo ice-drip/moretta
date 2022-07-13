@@ -23,6 +23,7 @@ const config = JSON.parse(
   const table = new Table({
     head: ["type","user", "time", "error lint", "line", "severity"],
   });
+  const user:Record<string,string> = config.user?config.user:{};
   const tableArr: HorizontalTableRow[] = [];
   let records: Record<string, (string | undefined)[][]> = {};
   if (config.eslint) {
@@ -40,7 +41,12 @@ const config = JSON.parse(
   }
   Object.keys(records).sort((x,y)=>x.localeCompare(y)).some((key) => {
     tableArr.push(["file",{ colSpan: 5, content: key }]);
-    tableArr.push(...records[key]);
+    tableArr.push(...records[key].map(item=>{
+      if(item[1]&&user[item[1]]){
+        item[1] = user[item[1]]
+      }
+      return item;
+    }));
   });
 
   if (tableArr.length > 1) {

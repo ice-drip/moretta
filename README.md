@@ -49,7 +49,11 @@ Example Config
   "eslint":"src/**/*.{vue,ts,tsx}", 
   // package script key 
   // package.json script: {"vue-tsc":"vue-tsc --noEmit --skipLibCheck --pretty"}
-  "vue-tsc":"vue-tsc" 
+  "vue-tsc":"vue-tsc",
+  // contributor map
+  "contributor":{
+    "rikka":"Muromi Rikka"
+  }
 }
 ```
 
