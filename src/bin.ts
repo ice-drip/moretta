@@ -23,7 +23,7 @@ const config = JSON.parse(
   const table = new Table({
     head: ["type","user", "time", "error lint", "line", "severity"],
   });
-  const user:Record<string,string> = config.user?config.user:{};
+  const user:Record<string,string> = config.contributor?config.contributor:{};
   const tableArr: HorizontalTableRow[] = [];
   let records: Record<string, (string | undefined)[][]> = {};
   if (config.eslint) {
