@@ -1,18 +1,18 @@
-import { HorizontalTableRow } from "cli-table3";
 import { ESLint } from "eslint";
 import { relative } from "path";
 import { ESLintOutput } from "../types/eslint.interface";
 import { GitUtil } from "../utils/git.util";
 
 export class ESLintFeature {
-  private eslint = new ESLint({ cache: true });
+  private eslint:ESLint;
   private files: string;
   private gitUtil: GitUtil;
   private basePath: string;
-  constructor(files: string, gitUtil: GitUtil, basePath: string) {
+  constructor(eslint:ESLint,files: string, gitUtil: GitUtil, basePath: string) {
     this.files = files;
     this.gitUtil = gitUtil;
     this.basePath = basePath;
+    this.eslint = eslint;
   }
 
   public async lint() {

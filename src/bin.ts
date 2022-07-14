@@ -31,7 +31,9 @@ console.log("project manange: "+pm);
   const tableArr: HorizontalTableRow[] = [];
   let records: Record<string, (string | undefined)[][]> = {};
   if (config.eslint) {
+    const ESLint = (await import("eslint")).ESLint;
     const eslint = new ESLintFeature(
+      new ESLint({cache:true}),
       resolve(basePath, config.eslint),
       git,
       basePath
