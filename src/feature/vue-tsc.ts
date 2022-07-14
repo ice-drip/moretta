@@ -7,23 +7,25 @@ export class VueTSC {
   private git: GitUtil;
   private pm: string;
   private basePath: string;
-  constructor(git: GitUtil, pm: string, basePath: string) {
+  private script: string;
+  constructor(git: GitUtil, pm: string, basePath: string, script: string) {
     this.git = git;
     this.pm = pm;
     this.basePath = basePath;
+    this.script = script;
   }
 
   public async lint(): Promise<Record<string, (string | undefined)[][]>> {
     let command = "";
     switch (this.pm) {
       case "pnpm":
-        command = "pnpm vue-tsc";
+        command = "pnpm " + this.script;
         break;
       case "yarn":
-        command = "yarn vue-tsc";
+        command = "yarn " + this.script;
         break;
       default:
-        command = "npm run vue-tsc";
+        command = "npm run " + this.script;
         break;
     }
     const records: Record<string, (string | undefined)[][]> = {};
@@ -49,11 +51,15 @@ export class VueTSC {
     });
     const errList = await exec$;
     errList.some((item) => {
-      const file = relative(this.basePath,resolve(item.file))
+      const file = relative(this.basePath, resolve(item.file));
       if (!records[file]) {
         records[file] = [];
       }
-      const blame = this.git.blame(resolve(this.basePath,file),Number(item.line),Number(item.line));
+      const blame = this.git.blame(
+        resolve(this.basePath, file),
+        Number(item.line),
+        Number(item.line)
+      );
       records[file].push([
         "vue-tsc",
         blame?.user,

@@ -6,7 +6,7 @@ A enhance linter util
 
 * [x] eslint
 * [x] vue-tsc
-* [ ] tsc
+* [x] tsc
 * [ ] stylelint
 * [ ] prettier
 
@@ -41,15 +41,18 @@ pnpm moretta
 ```
 
 Example Config
-```json
+```typescript
 {
   // package manage: "npm"|"yarn"|"pnpm"
   "pm":"pnpm", 
   // eslint match file
   "eslint":"src/**/*.{vue,ts,tsx}", 
   // package script key 
-  // package.json script: {"vue-tsc":"vue-tsc --noEmit --skipLibCheck --pretty"}
-  "vue-tsc":"vue-tsc",
+  // package.json script: {"lint:tsc":"tsc --noEmit"}
+  "tsc":"lint:tsc",
+  // package script key 
+  // package.json script: {"lint:vue-tsc":"vue-tsc --noEmit --skipLibCheck --pretty"}
+  "vue-tsc":"lint:vue-tsc",
   // contributor map
   "contributor":{
     "rikka":"Muromi Rikka"

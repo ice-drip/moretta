@@ -1,4 +1,4 @@
-import { execSync, spawnSync } from "child_process";
+import { execSync } from "child_process";
 import dayjs from "dayjs";
 
 export class GitUtil {
@@ -8,7 +8,10 @@ export class GitUtil {
   }
 
   public blame(file: string, lineStart: number, lineEnd: number) {
-    const regex = new RegExp(`([a-z0-9]{8}) \\((.*?) (.*?) [0-9]*?\\)(.*)`, "g");
+    const regex = new RegExp(
+      `([a-z0-9]{8}) \\((.*?) (.*?) [0-9]*?\\)(.*)`,
+      "g"
+    );
     const blameRes = this.runCommand(
       `git blame ${file} -L ${lineStart},${lineEnd}`
     );
