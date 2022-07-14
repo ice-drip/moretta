@@ -7,6 +7,7 @@ import { VueTSC } from "./feature/vue-tsc";
 import { readFileSync } from "fs";
 import { isArray, mergeWith } from "lodash-es";
 import { Tsc } from "./feature/tsc";
+import { StyleLint } from "./feature/stylelint";
 
 function mergeCustomizer<T>(objValue: Array<T>, srcValue: Array<T>) {
   if (isArray(objValue)) {
@@ -48,6 +49,11 @@ console.log("project manange: "+pm);
   if (config["tsc"]) {
     const tsc = new Tsc(git, pm, basePath, "lint:tsc");
     records = mergeWith(records, await tsc.lint(), mergeCustomizer);
+  }
+
+  if(config["stylelint"]){
+    const stylelint = new StyleLint(git,config["stylelint"],pm,basePath)
+    records = mergeWith(records, await stylelint.lint(), mergeCustomizer);
   }
 
   Object.keys(records)

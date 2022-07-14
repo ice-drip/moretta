@@ -7,7 +7,7 @@ A enhance linter util
 * [x] eslint
 * [x] vue-tsc
 * [x] tsc
-* [ ] stylelint
+* [x] stylelint
 * [ ] prettier
 
 ## Installation
