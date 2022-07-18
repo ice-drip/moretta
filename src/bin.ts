@@ -9,6 +9,8 @@ import { isArray, mergeWith } from "lodash-es";
 import { Tsc } from "./feature/tsc";
 import { StyleLint } from "./feature/stylelint";
 import { MorettaInfo } from "./types/common.interface";
+import { UploadUtil, Warning } from "./utils/upload.util";
+import { Cortado } from "./feature/cortado";
 
 function mergeCustomizer<T>(objValue: Array<T>, srcValue: Array<T>) {
   if (isArray(objValue)) {
@@ -55,6 +57,11 @@ console.log("project manange: "+pm);
   if(config["stylelint"]){
     const stylelint = new StyleLint(git,config["stylelint"],pm,basePath)
     records = mergeWith(records, await stylelint.lint(), mergeCustomizer);
+  }
+
+  if(config["api"]&&config["ak"]){
+    const cortado = new Cortado(config["ak"],config["api"]);
+    await cortado.upload(Object.keys(records).flatMap(key=>records[key]),config["project_name"]||"cortado")
   }
 
   Object.keys(records)
