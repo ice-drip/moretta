@@ -1,5 +1,6 @@
 import { ESLint } from "eslint";
 import { relative } from "path";
+import { MorettaInfo } from "../types/common.interface";
 import { ESLintOutput } from "../types/eslint.interface";
 import { GitUtil } from "../utils/git.util";
 
@@ -48,21 +49,22 @@ export class ESLintFeature {
           usedDeprecatedRules,
         })
       );
-    const records:Record<string,(string|undefined)[][]> = {};
+    const records:Record<string, MorettaInfo[]> = {};
     res.some((item) => {
       const filePath = relative(this.basePath, item.filePath as string);
       if(records[filePath]===undefined){
         records[filePath] = []
       }
       item.messages?.some((msg) => {
-        const blame = this.gitUtil.blame(filePath, msg.line, msg.endLine);
+        const blame = this.gitUtil.blame(filePath, msg.line);
         records[filePath].push([
           "eslint",
-          blame?.user,
-          blame?.time,
-          msg.ruleId,
+          blame?.committer||"unknow",
+          blame?.committer_time||"unknow",
+          msg.ruleId||"unknow",
           `${msg.line}-${msg.endLine}`,
-          msg.severity?.toString(),
+          msg.severity?.toString()||"unknow",
+          blame||null
         ])
       });
     });

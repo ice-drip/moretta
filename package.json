@@ -1,6 +1,6 @@
 {
   "name": "@kaffee/moretta",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "@kaffee/espresso": "^1.0.6",
     "@types/lodash-es": "^4.17.6",
     "ansicolor": "^1.1.100",
     "cli-table3": "^0.6.2",

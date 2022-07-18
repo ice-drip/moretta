@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import { strip } from "ansicolor";
 import { GitUtil } from "../utils/git.util";
 import { relative, resolve } from "path";
+import { MorettaInfo } from "../types/common.interface";
 
 export class VueTSC {
   private git: GitUtil;
@@ -15,7 +16,7 @@ export class VueTSC {
     this.script = script;
   }
 
-  public async lint(): Promise<Record<string, (string | undefined)[][]>> {
+  public async lint(): Promise<Record<string, MorettaInfo[]>> {
     let command = "";
     switch (this.pm) {
       case "pnpm":
@@ -28,7 +29,7 @@ export class VueTSC {
         command = "npm run " + this.script;
         break;
     }
-    const records: Record<string, (string | undefined)[][]> = {};
+    const records: Record<string, MorettaInfo[]> = {};
     const exec$ = new Promise<Array<VueTSCError>>((resolve, reject) => {
       exec(command, { cwd: this.basePath }, (error, stdout, stderr) => {
         if (stdout) {
@@ -58,15 +59,15 @@ export class VueTSC {
       const blame = this.git.blame(
         resolve(this.basePath, file),
         Number(item.line),
-        Number(item.line)
       );
       records[file].push([
         "vue-tsc",
-        blame?.user,
-        blame?.time,
+        blame?.committer||"unknown",
+        blame?.committer_time||"unknown",
         item.code,
         `${item.line}:${item.column}`,
         "5",
+        blame||null
       ]);
     });
     return records;

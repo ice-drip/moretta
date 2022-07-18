@@ -1,6 +1,7 @@
 import { strip } from "ansicolor";
 import { exec } from "child_process";
 import { relative, resolve } from "path";
+import { MorettaInfo } from "../types/common.interface";
 import { GitUtil } from "../utils/git.util";
 
 export class Tsc{
@@ -15,7 +16,7 @@ export class Tsc{
       this.script = script;
     }
 
-    public async lint(): Promise<Record<string, (string | undefined)[][]>> {
+    public async lint(): Promise<Record<string, MorettaInfo[]>> {
         let command = "";
         switch (this.pm) {
           case "pnpm":
@@ -29,7 +30,7 @@ export class Tsc{
             break;
         }
 
-        const records: Record<string, (string | undefined)[][]> = {};
+        const records: Record<string, MorettaInfo[]> = {};
         const exec$ = new Promise<Array<TSCError>>((resolve, reject) => {
           exec(command, { cwd: this.basePath }, (error, stdout, stderr) => {
             if (stdout) {
@@ -56,14 +57,15 @@ export class Tsc{
           if (!records[file]) {
             records[file] = [];
           }
-          const blame = this.git.blame(resolve(this.basePath,file),Number(item.line),Number(item.line));
+          const blame = this.git.blame(resolve(this.basePath,file),Number(item.line));
           records[file].push([
             "tsc",
-            blame?.user,
-            blame?.time,
+            blame?.committer||"unknown",
+            blame?.committer_time||"unknown",
             item.code,
             `${item.line}:${item.column}`,
             "5",
+            blame||null
           ]);
         });
         return records;

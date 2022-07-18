@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@kaffee/espresso': ^1.0.6
   '@types/eslint': ^8.4.5
   '@types/lodash-es': ^4.17.6
   '@types/node': ^16
@@ -17,6 +18,7 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
+  '@kaffee/espresso': 1.0.6
   '@types/lodash-es': 4.17.6
   ansicolor: 1.1.100
   cli-table3: 0.6.2
@@ -129,6 +131,10 @@ packages:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
+
+  /@kaffee/espresso/1.0.6:
+    resolution: {integrity: sha512-cfv0uvKhFXvGsTrzV3HmtUcxpgKHyJ8CQwp75PPv4ty9mhyc7HM588zvRbhOglzF38kHGPQiV/w5qGCkPQRV4Q==}
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}

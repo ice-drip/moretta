@@ -8,6 +8,7 @@ import { readFileSync } from "fs";
 import { isArray, mergeWith } from "lodash-es";
 import { Tsc } from "./feature/tsc";
 import { StyleLint } from "./feature/stylelint";
+import { MorettaInfo } from "./types/common.interface";
 
 function mergeCustomizer<T>(objValue: Array<T>, srcValue: Array<T>) {
   if (isArray(objValue)) {
@@ -30,7 +31,7 @@ console.log("project manange: "+pm);
     ? config.contributor
     : {};
   const tableArr: HorizontalTableRow[] = [];
-  let records: Record<string, (string | undefined)[][]> = {};
+  let records: Record<string, MorettaInfo[]> = {};
   if (config.eslint) {
     const ESLint = (await import("eslint")).ESLint;
     const eslint = new ESLintFeature(
@@ -65,7 +66,7 @@ console.log("project manange: "+pm);
           if (item[1] && user[item[1]]) {
             item[1] = user[item[1]];
           }
-          return item;
+          return item.slice(0,6) as string[];
         })
       );
     });

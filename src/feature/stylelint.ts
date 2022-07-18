@@ -1,4 +1,5 @@
 import { relative, resolve } from "path";
+import { MorettaInfo } from "../types/common.interface";
 import { GitUtil } from "../utils/git.util";
 export class StyleLint {
   private git: GitUtil;
@@ -23,14 +24,13 @@ export class StyleLint {
         maxWarnings: 0,
       })
     ).output;
-    const records: Record<string, (string | undefined)[][]> = {};
+    const records: Record<string, MorettaInfo[]> = {};
     const resultJson: StylelintOutput[] = JSON.parse(result);
     resultJson.some((item) => {
       item.warnings.map((warn) => {
         const blame = this.git.blame(
           resolve(item.source),
           warn.line,
-          warn.endLine
         );
         const file = relative(this.basePath, resolve(item.source));
         if (!records[file]) {
@@ -38,11 +38,12 @@ export class StyleLint {
         }
         records[file].push([
           "stylelint",
-          blame?.user,
-          blame?.time,
+          blame?.committer||"unknown",
+          blame?.committer_time||"unknown",
           warn.rule,
           `${warn.line} - ${warn.endLine}`,
           warn.severity,
+          blame||null
         ]);
       });
     });

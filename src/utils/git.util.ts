@@ -7,22 +7,39 @@ export class GitUtil {
     this.basePath = basePath ? basePath : process.cwd();
   }
 
-  public blame(file: string, lineStart: number, lineEnd: number) {
-    const regex = new RegExp(
-      `([a-z0-9]{8}) \\((.*?) (.*?) [0-9]*?\\)(.*)`,
-      "g"
-    );
+  public blame(file: string, lineStart: number):Blame|null {
     const blameRes = this.runCommand(
-      `git blame ${file} -L ${lineStart},${lineEnd}`
+      `git blame ${file} -L ${lineStart},${lineStart} -w --line-porcelain`
     );
-    const res = regex.exec(blameRes);
-    if (res) {
+    const blames = blameRes.split("\n")
+
+    if (blames.length>3) {
+      const [hash,sourceLine,resultLine,num_line] = blames[0].split(" ");
+      const [,author] = splitOnce(blames[1]," ");
+      const [,email] = splitOnce(blames[2]," ");
+      const [,author_time] = splitOnce(blames[3]," ");
+      const [,committer] = splitOnce(blames[5]," ");
+      const [,committer_mail] = splitOnce(blames[6]," ");
+      const [,committer_time] = splitOnce(blames[7]," ");
+      const [,summary] = splitOnce(blames[9]," ");
+      const [,filename] = splitOnce(blames[10]," ");
+      const code = blames[11]
       return {
-        origin: res[0],
-        id: res[1],
-        user: res[2],
-        time: dayjs(res[3]).format("YYYY-MM-DD HH:mm:ss"),
-        code: res[5],
+        hash,
+        sourceLine,
+        resultLine,
+        num_line,
+        author,
+        email,
+        author_time: dayjs.unix(Number(author_time)).format('YYYY-MM-DD HH:mm:ss'),
+        committer,
+        committer_mail,
+        committer_time: dayjs
+          .unix(Number(committer_time))
+          .format('YYYY-MM-DD HH:mm:ss'),
+        summary,
+        filename,
+        code
       };
     } else {
       return null;
@@ -32,4 +49,25 @@ export class GitUtil {
   private runCommand(command: string) {
     return execSync(command, { cwd: this.basePath }).toString();
   }
+}
+
+function splitOnce(str:string,comma:string){
+  const firstLength = str.split(comma)[0].length;
+  return [str.slice(0,firstLength+1),str.slice(firstLength)]
+}
+
+export interface Blame{
+  hash: string;
+  sourceLine: string;
+  resultLine: string;
+  num_line: string;
+  author: string;
+  email: string;
+  author_time: string;
+  committer: string;
+  committer_mail: string;
+  committer_time: string;
+  summary: string;
+  filename: string;
+  code: string;
 }
