@@ -29,16 +29,16 @@ export class GitUtil {
         sourceLine,
         resultLine,
         num_line,
-        author,
-        email,
+        author:author.trim(),
+        email:email.trim(),
         author_time: dayjs.unix(Number(author_time)).format('YYYY-MM-DD HH:mm:ss'),
-        committer,
-        committer_mail,
+        committer:committer.trim(),
+        committer_mail:committer_mail.trim(),
         committer_time: dayjs
           .unix(Number(committer_time))
           .format('YYYY-MM-DD HH:mm:ss'),
-        summary,
-        filename,
+        summary:summary.trim(),
+        filename:filename.trim(),
         code
       };
     } else {
