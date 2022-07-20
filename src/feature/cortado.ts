@@ -11,7 +11,7 @@ export class Cortado {
 
   public async upload(list: MorettaInfo[],project_name:string) {
     const res = await UploadUtil.uploadWarning(this.api,this.token,this.generateCortado(list,project_name));
-    console.log(res);
+    console.log("cortado upload success");
   }
 
   private generateCortado(list: MorettaInfo[],project_name:string):Warning[] {
