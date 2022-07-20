@@ -33,9 +33,7 @@
     "ansicolor": "^1.1.100",
     "cli-table3": "^0.6.2",
     "dayjs": "^1.11.3",
-    "eslint": "^8.19.0",
     "lodash-es": "^4.17.21",
-    "node-fetch": "^3.2.8",
-    "stylelint": "^14.9.1"
+    "node-fetch": "^3.2.8"
   }
 }
