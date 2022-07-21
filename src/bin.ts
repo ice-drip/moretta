@@ -23,7 +23,7 @@ const config = JSON.parse(
   readFileSync(resolve(basePath, "moretta.config.json")).toString()
 );
 const pm = config["pm"] ? config["pm"] : "npm";
-console.log("project manange: "+pm);
+console.log("project manange: " + pm);
 (async () => {
   const git = new GitUtil(basePath);
   const table = new Table({
@@ -36,13 +36,30 @@ console.log("project manange: "+pm);
   let records: Record<string, MorettaInfo[]> = {};
   if (config.eslint) {
     const ESLint = (await import("eslint")).ESLint;
-    const eslint = new ESLintFeature(
-      new ESLint({cache:true}),
-      resolve(basePath, config.eslint),
-      git,
-      basePath
-    );
-    records = mergeWith(records, await eslint.lint(), mergeCustomizer);
+    if (ESLint) {
+      const eslint = new ESLintFeature(
+        new ESLint({ cache: true }),
+        resolve(basePath, config.eslint),
+        git,
+        basePath
+      );
+      records = mergeWith(records, await eslint.lint(), mergeCustomizer);
+    } else {
+      const CLIEngine = ((await import("eslint")) as any).CLIEngine;
+      if (CLIEngine) {
+        const eslint = new ESLintFeature(
+          new CLIEngine({ cache: true }),
+          resolve(basePath, config.eslint),
+          git,
+          basePath
+        );
+        records = mergeWith(
+          records,
+          await eslint.oldLint(CLIEngine),
+          mergeCustomizer
+        );
+      }
+    }
   }
   if (config["vue-tsc"]) {
     const vue_tsc = new VueTSC(git, pm, basePath, "lint:vue-tsc");
@@ -54,14 +71,17 @@ console.log("project manange: "+pm);
     records = mergeWith(records, await tsc.lint(), mergeCustomizer);
   }
 
-  if(config["stylelint"]){
-    const stylelint = new StyleLint(git,config["stylelint"],pm,basePath)
+  if (config["stylelint"]) {
+    const stylelint = new StyleLint(git, config["stylelint"], pm, basePath);
     records = mergeWith(records, await stylelint.lint(), mergeCustomizer);
   }
 
-  if(config["api"]&&config["ak"]){
-    const cortado = new Cortado(config["ak"],config["api"]);
-    await cortado.upload(Object.keys(records).flatMap(key=>records[key]),config["project_name"]||"cortado")
+  if (config["api"] && config["ak"]) {
+    const cortado = new Cortado(config["ak"], config["api"]);
+    await cortado.upload(
+      Object.keys(records).flatMap((key) => records[key]),
+      config["project_name"] || "cortado"
+    );
   }
 
   Object.keys(records)
@@ -73,7 +93,7 @@ console.log("project manange: "+pm);
           if (item[1] && user[item[1]]) {
             item[1] = user[item[1]];
           }
-          return item.slice(0,6) as string[];
+          return item.slice(0, 6) as string[];
         })
       );
     });
