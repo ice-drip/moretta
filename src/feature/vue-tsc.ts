@@ -67,7 +67,8 @@ export class VueTSC {
         item.code,
         `${item.line}:${item.column}`,
         "5",
-        blame||null
+        blame||null,
+        file
       ]);
     });
     return records;

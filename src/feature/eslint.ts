@@ -64,7 +64,8 @@ export class ESLintFeature {
           msg.ruleId||"unknow",
           `${msg.line}-${msg.endLine}`,
           msg.severity?.toString()||"unknow",
-          blame||null
+          blame||null,
+          filePath
         ])
       });
     });

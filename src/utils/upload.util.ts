@@ -18,5 +18,6 @@ export interface Warning{
     "rule": string;
     "position": string;
     "severity": string;
+    file_path:string
   }
   

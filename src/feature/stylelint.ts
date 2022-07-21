@@ -43,7 +43,8 @@ export class StyleLint {
           warn.rule,
           `${warn.line} - ${warn.endLine}`,
           warn.severity,
-          blame||null
+          blame||null,
+          file
         ]);
       });
     });

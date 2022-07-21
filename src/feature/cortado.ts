@@ -16,9 +16,10 @@ export class Cortado {
 
   private generateCortado(list: MorettaInfo[],project_name:string):Warning[] {
     return list.map((data) => {
-      const [type, user, time, rule, position, severity] = data;
-      const hash = HmacRIPEMD160(project_name+data.join(","), "5p2O5qKT6JCM").toString();
-      return { project_name,hash, type, user, time, rule, position, severity };
+      const [type, user, time, rule, position, severity,blame,file_path] = data;
+      const hashString = [project_name,type, user, time, rule, position, severity,file_path].join(",")
+      const hash = HmacRIPEMD160(hashString, "5p2O5qKT6JCM").toString();
+      return { project_name,hash, type, user, time, rule, position, severity,file_path };
     });
   }
 }

@@ -65,7 +65,8 @@ export class Tsc{
             item.code,
             `${item.line}:${item.column}`,
             "5",
-            blame||null
+            blame||null,
+            file
           ]);
         });
         return records;
