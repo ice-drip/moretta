@@ -1,22 +1,16 @@
 import Table, { HorizontalTableRow } from "cli-table3";
 import { GitUtil } from "./utils/git.util";
 import { strip } from "ansicolor";
-import { ESLintFeature } from "./feature/eslint";
+import { ESLintFeature, execESLint } from "./feature/eslint";
 import { resolve } from "path";
 import { VueTSC } from "./feature/vue-tsc";
 import { readFileSync } from "fs";
-import { isArray, mergeWith } from "lodash-es";
+import { mergeWith } from "lodash-es";
 import { Tsc } from "./feature/tsc";
-import { StyleLint } from "./feature/stylelint";
+import { execStylelint, StyleLint } from "./feature/stylelint";
 import { MorettaInfo } from "./types/common.interface";
-import { UploadUtil, Warning } from "./utils/upload.util";
 import { Cortado } from "./feature/cortado";
-
-function mergeCustomizer<T>(objValue: Array<T>, srcValue: Array<T>) {
-  if (isArray(objValue)) {
-    return objValue.concat(srcValue);
-  }
-}
+import { mergeCustomizer } from "./utils/common.util";
 
 const basePath = process.cwd();
 const config = JSON.parse(
@@ -35,30 +29,9 @@ console.log("project manange: " + pm);
   const tableArr: HorizontalTableRow[] = [];
   let records: Record<string, MorettaInfo[]> = {};
   if (config.eslint) {
-    const ESLint = (await import("eslint")).ESLint;
-    if (ESLint) {
-      const eslint = new ESLintFeature(
-        new ESLint({ cache: true }),
-        resolve(basePath, config.eslint),
-        git,
-        basePath
-      );
-      records = mergeWith(records, await eslint.lint(), mergeCustomizer);
-    } else {
-      const CLIEngine = ((await import("eslint")) as any).CLIEngine;
-      if (CLIEngine) {
-        const eslint = new ESLintFeature(
-          new CLIEngine({ cache: true }),
-          resolve(basePath, config.eslint),
-          git,
-          basePath
-        );
-        records = mergeWith(
-          records,
-          await eslint.oldLint(CLIEngine),
-          mergeCustomizer
-        );
-      }
+    const result = await execESLint(config.eslint, git, basePath);
+    if (result) {
+      records = mergeWith(records, result, mergeCustomizer);
     }
   }
   if (config["vue-tsc"]) {
@@ -72,8 +45,10 @@ console.log("project manange: " + pm);
   }
 
   if (config["stylelint"]) {
-    const stylelint = new StyleLint(git, config["stylelint"], pm, basePath);
-    records = mergeWith(records, await stylelint.lint(), mergeCustomizer);
+    const stylelint = await execStylelint(config["stylelint"],git,basePath);
+    if(stylelint){
+      records = mergeWith(records, stylelint, mergeCustomizer);
+    }
   }
 
   if (config["api"] && config["ak"]) {

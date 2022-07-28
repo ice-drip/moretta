@@ -47,6 +47,9 @@ Example Config
   "pm":"pnpm", 
   // eslint match file
   "eslint":"src/**/*.{vue,ts,tsx}", 
+  // multiple path
+  "eslint":["src/**/*.{vue,ts,tsx}"], 
+  "stylelint":["src/**/*.{vue,scss,css}"], 
   // package script key 
   // package.json script: {"lint:tsc":"tsc --noEmit"}
   "tsc":"lint:tsc",

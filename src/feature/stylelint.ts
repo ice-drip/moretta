@@ -1,15 +1,15 @@
+import { mergeWith } from "lodash-es";
 import { relative, resolve } from "path";
 import { MorettaInfo } from "../types/common.interface";
+import { mergeCustomizer } from "../utils/common.util";
 import { GitUtil } from "../utils/git.util";
 export class StyleLint {
   private git: GitUtil;
-  private pm: string;
   private basePath: string;
   private files: string;
 
-  constructor(git: GitUtil, files: string, pm: string, basePath: string) {
+  constructor(git: GitUtil, files: string,  basePath: string) {
     this.git = git;
-    this.pm = pm;
     this.basePath = basePath;
     this.files = files;
   }
@@ -28,23 +28,20 @@ export class StyleLint {
     const resultJson: StylelintOutput[] = JSON.parse(result);
     resultJson.some((item) => {
       item.warnings.map((warn) => {
-        const blame = this.git.blame(
-          resolve(item.source),
-          warn.line,
-        );
+        const blame = this.git.blame(resolve(item.source), warn.line);
         const file = relative(this.basePath, resolve(item.source));
         if (!records[file]) {
           records[file] = [];
         }
         records[file].push([
           "stylelint",
-          blame?.committer||"unknown",
-          blame?.committer_time||"unknown",
+          blame?.committer || "unknown",
+          blame?.committer_time || "unknown",
           warn.rule,
           `${warn.line} - ${warn.endLine}`,
           warn.severity,
-          blame||null,
-          file
+          blame || null,
+          file,
         ]);
       });
     });
@@ -69,4 +66,25 @@ export interface Warning {
   rule: string;
   severity: string;
   text: string;
+}
+
+export async function execStylelint(
+  pattern: string | string[],
+  git: GitUtil,
+  basePath: string
+) {
+  if (typeof pattern === "string") {
+    const stylelint = new StyleLint(git, pattern,  basePath);
+    return await stylelint.lint();
+  }
+  else if (pattern instanceof Array) {
+    const resultList = pattern.map(
+      async (item) => await execStylelint(item, git, basePath)
+    );
+    let records: Record<string, MorettaInfo[]> = {};
+    resultList.some(async (item) => {
+      records = mergeWith(records, await item, mergeCustomizer);
+    });
+    return records;
+  }
 }
