@@ -117,13 +117,12 @@ export async function execESLint(
       }
     }
   } else if (pattern instanceof Array) {
-    const resultList = pattern.map(
-      async (item) => await execESLint(item, git, basePath)
-    );
     let records: Record<string, MorettaInfo[]> = {};
-    resultList.some(async (item) => {
-      records = mergeWith(records, await item, mergeCustomizer);
-    });
+    for(let i = 0;i<pattern.length;i++){
+      const item = await execESLint(pattern[i], git, basePath)
+      records = mergeWith(records, item, mergeCustomizer);
+    }
+  
     return records;
   }
   return null;

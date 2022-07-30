@@ -29,10 +29,12 @@ console.log("project manange: " + pm);
   const tableArr: HorizontalTableRow[] = [];
   let records: Record<string, MorettaInfo[]> = {};
   if (config.eslint) {
+    console.log("run eslint");
     const result = await execESLint(config.eslint, git, basePath);
     if (result) {
       records = mergeWith(records, result, mergeCustomizer);
     }
+    console.log("exit eslint");
   }
   if (config["vue-tsc"]) {
     const vue_tsc = new VueTSC(git, pm, basePath, "lint:vue-tsc");

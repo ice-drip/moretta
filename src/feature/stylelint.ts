@@ -78,13 +78,11 @@ export async function execStylelint(
     return await stylelint.lint();
   }
   else if (pattern instanceof Array) {
-    const resultList = pattern.map(
-      async (item) => await execStylelint(item, git, basePath)
-    );
     let records: Record<string, MorettaInfo[]> = {};
-    resultList.some(async (item) => {
-      records = mergeWith(records, await item, mergeCustomizer);
-    });
+    for(let i = 0;i<pattern.length;i++){
+      const item = await execStylelint(pattern[i], git, basePath)
+      records = mergeWith(records, item, mergeCustomizer);
+    }
     return records;
   }
 }
