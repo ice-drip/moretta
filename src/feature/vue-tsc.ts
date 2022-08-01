@@ -3,6 +3,8 @@ import { strip } from "ansicolor";
 import { GitUtil } from "../utils/git.util";
 import { relative, resolve } from "path";
 import { MorettaInfo } from "../types/common.interface";
+import { mergeCustomizer } from "../utils/common.util";
+import { mergeWith } from "lodash-es";
 
 export class VueTSC {
   private git: GitUtil;
@@ -72,6 +74,25 @@ export class VueTSC {
       ]);
     });
     return records;
+  }
+}
+
+export async function execVueTsc(
+  pattern: string | string[],
+  git: GitUtil,
+  basePath: string,
+  pm:string
+){
+  if (typeof pattern === "string") {
+    const vue_tsc = new VueTSC(git, pm, basePath, pattern);
+    return await vue_tsc.lint()
+  } else if (pattern instanceof Array) {
+    let records: Record<string, MorettaInfo[]> = {};
+    for(let i =0;i<pattern.length;i++){
+      const vue_tsc = new VueTSC(git, pm, basePath, pattern[i]);
+      records = mergeWith(records, await vue_tsc.lint(), mergeCustomizer);
+    }
+    return records
   }
 }
 

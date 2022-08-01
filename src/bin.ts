@@ -3,7 +3,7 @@ import { GitUtil } from "./utils/git.util";
 import { strip } from "ansicolor";
 import { ESLintFeature, execESLint } from "./feature/eslint";
 import { resolve } from "path";
-import { VueTSC } from "./feature/vue-tsc";
+import { execVueTsc, VueTSC } from "./feature/vue-tsc";
 import { readFileSync } from "fs";
 import { mergeWith } from "lodash-es";
 import { Tsc } from "./feature/tsc";
@@ -29,16 +29,14 @@ console.log("project manange: " + pm);
   const tableArr: HorizontalTableRow[] = [];
   let records: Record<string, MorettaInfo[]> = {};
   if (config.eslint) {
-    console.log("run eslint");
     const result = await execESLint(config.eslint, git, basePath);
     if (result) {
       records = mergeWith(records, result, mergeCustomizer);
     }
-    console.log("exit eslint");
   }
   if (config["vue-tsc"]) {
-    const vue_tsc = new VueTSC(git, pm, basePath, "lint:vue-tsc");
-    records = mergeWith(records, await vue_tsc.lint(), mergeCustomizer);
+    const vue_tsc = await execVueTsc(config["vue-tsc"],git,basePath,pm);
+    records = mergeWith(records, vue_tsc, mergeCustomizer);
   }
 
   if (config["tsc"]) {
