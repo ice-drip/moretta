@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import { strip } from "ansicolor";
 import { GitUtil } from "../utils/git.util";
 import { relative, resolve } from "path";
-import { MorettaInfo } from "../types/common.interface";
+import { MorettaInfo, MultiConfig } from "../types/common.interface";
 import { mergeCustomizer } from "../utils/common.util";
 import { mergeWith } from "lodash-es";
 
@@ -11,11 +11,13 @@ export class VueTSC {
   private pm: string;
   private basePath: string;
   private script: string;
-  constructor(git: GitUtil, pm: string, basePath: string, script: string) {
+  private projectPath:string;
+  constructor(git: GitUtil, pm: string, basePath: string, script: string,projectPath:string) {
     this.git = git;
     this.pm = pm;
     this.basePath = basePath;
     this.script = script;
+    this.projectPath = projectPath;
   }
 
   public async lint(): Promise<Record<string, MorettaInfo[]>> {
@@ -54,12 +56,12 @@ export class VueTSC {
     });
     const errList = await exec$;
     errList.some((item) => {
-      const file = relative(this.basePath, resolve(item.file));
+      const file = relative(this.projectPath,resolve(this.basePath,item.file));
       if (!records[file]) {
         records[file] = [];
       }
       const blame = this.git.blame(
-        resolve(this.basePath, file),
+        file,
         Number(item.line),
       );
       records[file].push([
@@ -78,18 +80,18 @@ export class VueTSC {
 }
 
 export async function execVueTsc(
-  pattern: string | string[],
+  pattern: string | MultiConfig[],
   git: GitUtil,
   basePath: string,
   pm:string
 ){
   if (typeof pattern === "string") {
-    const vue_tsc = new VueTSC(git, pm, basePath, pattern);
+    const vue_tsc = new VueTSC(git, pm, basePath, pattern,basePath);
     return await vue_tsc.lint()
   } else if (pattern instanceof Array) {
     let records: Record<string, MorettaInfo[]> = {};
     for(let i =0;i<pattern.length;i++){
-      const vue_tsc = new VueTSC(git, pm, basePath, pattern[i]);
+      const vue_tsc = new VueTSC(git, pm, resolve(basePath,pattern[i]["base_path"]), pattern[i]["command"],basePath);
       records = mergeWith(records, await vue_tsc.lint(), mergeCustomizer);
     }
     return records

@@ -1,7 +1,7 @@
 import { ESLint } from "eslint";
 import { mergeWith } from "lodash-es";
 import { relative, resolve } from "path";
-import { MorettaInfo } from "../types/common.interface";
+import { MorettaInfo, MultiConfig } from "../types/common.interface";
 import { ESLintOutput } from "../types/eslint.interface";
 import { mergeCustomizer } from "../utils/common.util";
 import { GitUtil } from "../utils/git.util";
@@ -11,16 +11,19 @@ export class ESLintFeature {
   private files: string;
   private gitUtil: GitUtil;
   private basePath: string;
+  private projectPath:string;
   constructor(
     eslint: ESLint,
     files: string,
     gitUtil: GitUtil,
-    basePath: string
+    basePath: string,
+    projectPath:string
   ) {
     this.files = files;
     this.gitUtil = gitUtil;
     this.basePath = basePath;
     this.eslint = eslint;
+    this.projectPath = projectPath;
   }
 
   public async lint() {
@@ -59,13 +62,15 @@ export class ESLintFeature {
       );
     const records: Record<string, MorettaInfo[]> = {};
     res.some((item) => {
-      const filePath = relative(this.basePath, item.filePath as string);
-      if (records[filePath] === undefined) {
-        records[filePath] = [];
+      const filePath = resolve(item.filePath as string);
+      const file = relative(this.projectPath,filePath);
+
+      if (records[file] === undefined) {
+        records[file] = [];
       }
       item.messages?.some((msg) => {
         const blame = this.gitUtil.blame(filePath, msg.line);
-        records[filePath].push([
+        records[file].push([
           "eslint",
           blame?.committer || "unknow",
           blame?.committer_time || "unknow",
@@ -89,7 +94,7 @@ export class ESLintFeature {
 }
 
 export async function execESLint(
-  pattern: string | string[],
+  pattern: string | MultiConfig[],
   git: GitUtil,
   basePath: string
 ): Promise<Record<string, MorettaInfo[]> | null> {
@@ -100,6 +105,7 @@ export async function execESLint(
         new ESLint({ cache: true }),
         resolve(basePath, pattern),
         git,
+        basePath,
         basePath
       );
       return await eslint.lint();
@@ -110,6 +116,7 @@ export async function execESLint(
           new CLIEngine({ cache: true }),
           resolve(basePath, pattern),
           git,
+          basePath,
           basePath
         );
 
@@ -119,7 +126,7 @@ export async function execESLint(
   } else if (pattern instanceof Array) {
     let records: Record<string, MorettaInfo[]> = {};
     for(let i = 0;i<pattern.length;i++){
-      const item = await execESLint(pattern[i], git, basePath)
+      const item = await execESLint(pattern[i].command, git, resolve(basePath,pattern[i].base_path))
       records = mergeWith(records, item, mergeCustomizer);
     }
   

@@ -48,7 +48,7 @@ Example Config
   // eslint match file
   "eslint":"src/**/*.{vue,ts,tsx}", 
   // multiple path
-  "eslint":["src/**/*.{vue,ts,tsx}"], 
+  "eslint":[ { "command": "app/main/src/**/*.{vue,ts}", "base_path": "." }], 
   "stylelint":["src/**/*.{vue,scss,css}"], 
   // package script key 
   // package.json script: {"lint:tsc":"tsc --noEmit"}

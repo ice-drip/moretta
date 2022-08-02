@@ -17,3 +17,8 @@ export type MorettaInfo = [
   Blame|null,
   FilePath
 ];
+
+export interface MultiConfig{
+  base_path:string;
+  command:string;
+}

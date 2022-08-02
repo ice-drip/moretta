@@ -1,6 +1,6 @@
 import { mergeWith } from "lodash-es";
 import { relative, resolve } from "path";
-import { MorettaInfo } from "../types/common.interface";
+import { MorettaInfo, MultiConfig } from "../types/common.interface";
 import { mergeCustomizer } from "../utils/common.util";
 import { GitUtil } from "../utils/git.util";
 export class StyleLint {
@@ -69,7 +69,7 @@ export interface Warning {
 }
 
 export async function execStylelint(
-  pattern: string | string[],
+  pattern: string | MultiConfig[],
   git: GitUtil,
   basePath: string
 ) {
@@ -80,7 +80,7 @@ export async function execStylelint(
   else if (pattern instanceof Array) {
     let records: Record<string, MorettaInfo[]> = {};
     for(let i = 0;i<pattern.length;i++){
-      const item = await execStylelint(pattern[i], git, basePath)
+      const item = await execStylelint(pattern[i].command, git, resolve(basePath,pattern[i].base_path))
       records = mergeWith(records, item, mergeCustomizer);
     }
     return records;
