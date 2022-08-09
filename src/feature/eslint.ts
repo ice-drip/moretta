@@ -63,7 +63,7 @@ export class ESLintFeature {
     const records: Record<string, MorettaInfo[]> = {};
     res.some((item) => {
       const filePath = resolve(item.filePath as string);
-      const file = relative(this.projectPath,filePath);
+      const file = relative(this.projectPath,filePath).replace("\\","/");
 
       if (records[file] === undefined) {
         records[file] = [];

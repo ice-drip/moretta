@@ -53,7 +53,7 @@ export class Tsc{
         });
         const errList = await exec$;
         errList.some((item) => {
-          const file = relative(this.basePath,resolve(item.file))
+          const file = relative(this.basePath,resolve(item.file)).replace("\\","/");
           if (!records[file]) {
             records[file] = [];
           }

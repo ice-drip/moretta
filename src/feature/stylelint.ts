@@ -29,7 +29,7 @@ export class StyleLint {
     resultJson.some((item) => {
       item.warnings.map((warn) => {
         const blame = this.git.blame(resolve(item.source), warn.line);
-        const file = relative(this.basePath, resolve(item.source));
+        const file = relative(this.basePath, resolve(item.source)).replace("\\","/");
         if (!records[file]) {
           records[file] = [];
         }
