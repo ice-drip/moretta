@@ -56,7 +56,7 @@ export class VueTSC {
     });
     const errList = await exec$;
     errList.some((item) => {
-      const file = relative(this.projectPath,resolve(this.basePath,item.file)).replace("\\","/");
+      const file = relative(this.projectPath,resolve(this.basePath,item.file)).replaceAll("\\","/");
       if (!records[file]) {
         records[file] = [];
       }
