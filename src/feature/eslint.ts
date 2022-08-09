@@ -78,7 +78,7 @@ export class ESLintFeature {
           `${msg.line}-${msg.endLine}`,
           msg.severity?.toString() || "unknow",
           blame || null,
-          filePath,
+          file,
         ]);
       });
     });
